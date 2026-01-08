@@ -2,28 +2,23 @@
 import { computed } from "vue"
 import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo"
 import { useToast } from "@/composables/useToast"
-
-console.log("🏠 HomeView: Component setup starting...")
+import AddDomainModal from "@/components/AddDomainModal.vue"
+import DomainTable from "@/components/DomainTable.vue"
 
 const { data: domains, isLoading, error } = useDomains()
 const refreshMutation = useRefreshDomains()
 const { showToast } = useToast()
 
-console.log("🏠 HomeView: Setup complete", {
-  domains: domains.value,
-  isLoading: isLoading.value,
-  error: error.value,
-})
 
-const _isRefreshDisabled = computed(() => {
+const isRefreshDisabled = computed(() => {
   return refreshMutation.isPending.value
 })
 
-const _refreshButtonText = computed(() => {
+const refreshButtonText = computed(() => {
   return refreshMutation.isPending.value ? "Refreshing..." : "Refresh Info"
 })
 
-function _handleRefresh() {
+function handleRefresh() {
   refreshMutation.mutate(undefined, {
     onSuccess: () => {
       // Query will automatically refetch due to invalidation

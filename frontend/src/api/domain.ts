@@ -17,20 +17,11 @@ function getApiUrl(): string {
 
 const API_URL = getApiUrl()
 
-// Debug: log the API URL
-console.log("[API] Environment VITE_API_URL:", import.meta.env.VITE_API_URL)
-console.log("[API] Resolved Base URL:", API_URL)
-console.log("[API] Full endpoints:", {
-  fetch: `${API_URL}/domain-info/`,
-  add: `${API_URL}/domain-info/`,
-  refresh: `${API_URL}/domain-info/refresh`,
-})
 
 export async function fetchDomains(): Promise<DomainInfo[]> {
-  console.log("🌐 fetchDomains: Calling API at", `${API_URL}/domain-info/`)
+
   try {
     const res = await fetch(`${API_URL}/domain-info/`)
-    console.log("🌐 fetchDomains: Response status", res.status, res.statusText)
     if (!res.ok) {
       let errorMessage = "Failed to load domains"
       try {

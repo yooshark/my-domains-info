@@ -3,17 +3,25 @@ import { addDomain, fetchDomains, refreshDomains } from "@/api/domain"
 import type { DomainInfo } from "@/types/domain"
 
 export function useDomains() {
-  console.log("📡 useDomains: Setting up query...")
+  if (import.meta.env.DEV) {
+    console.log("📡 useDomains: Setting up query...")
+  }
   return useQuery<DomainInfo[]>({
     queryKey: ["domains"],
     queryFn: async () => {
-      console.log("📡 useDomains: Fetching domains...")
+      if (import.meta.env.DEV) {
+        console.log("📡 useDomains: Fetching domains...")
+      }
       try {
         const result = await fetchDomains()
-        console.log("✅ useDomains: Fetched", result.length, "domains")
+        if (import.meta.env.DEV) {
+          console.log("✅ useDomains: Fetched", result.length, "domains")
+        }
         return result
       } catch (error) {
-        console.error("❌ useDomains: Error fetching domains", error)
+        if (import.meta.env.DEV) {
+          console.error("❌ useDomains: Error fetching domains", error)
+        }
         throw error
       }
     },

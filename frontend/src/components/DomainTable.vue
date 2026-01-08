@@ -3,15 +3,14 @@ import { computed } from "vue"
 import type { DomainInfo } from "@/types/domain"
 
 interface Props {
-  domains?: DomainInfo[]
-  items?: DomainInfo[]
+  domains: DomainInfo[]
 }
 
 const props = defineProps<Props>()
 
-const _domains = computed(() => props.domains ?? props.items ?? [])
+const domains = computed(() => props.domains ?? [])
 
-function _getSubdomains(domain: DomainInfo): string[] {
+function getSubdomains(domain: DomainInfo): string[] {
   return domain.subdomains?.subdomains ?? []
 }
 </script>

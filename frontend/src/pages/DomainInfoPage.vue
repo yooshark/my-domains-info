@@ -2,16 +2,18 @@
 import { computed } from "vue"
 import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo"
 import { useToast } from "@/composables/useToast"
+import AddDomainModal from "@/components/AddDomainModal.vue"
+import DomainTable from "@/components/DomainTable.vue"
 
 const { data, isLoading, error } = useDomains()
 const refresh = useRefreshDomains()
 const { showToast } = useToast()
 
-const _isRefreshDisabled = computed(() => {
+const isRefreshDisabled = computed(() => {
   return refresh.isPending.value
 })
 
-function _handleRefresh() {
+function handleRefresh() {
   refresh.mutate(undefined, {
     onSuccess: () => {
       // Query will automatically refetch due to invalidation
@@ -42,7 +44,7 @@ function _handleRefresh() {
 
     <DomainTable
         v-if="data"
-        :items="data"
+        :domains="data"
     />
 
     <p v-if="isLoading">Загрузка…</p>

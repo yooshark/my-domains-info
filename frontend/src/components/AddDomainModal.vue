@@ -7,15 +7,15 @@ const domain = ref("")
 const add = useAddDomain()
 const { showToast } = useToast()
 
-const _isDisabled = computed(() => {
+const isDisabled = computed(() => {
   return add.isPending.value
 })
 
-const _buttonText = computed(() => {
+const buttonText = computed(() => {
   return add.isPending.value ? "Adding..." : "Add Domain"
 })
 
-function _handleAdd() {
+function handleAdd() {
   const trimmed = domain.value.trim()
   if (!trimmed) return
 
