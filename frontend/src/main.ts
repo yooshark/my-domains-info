@@ -12,6 +12,10 @@ const queryClient = new QueryClient({
   },
 })
 
+console.log("🚀 Initializing Vue app...")
+
 const app = createApp(App)
 app.use(VueQueryPlugin, { queryClient })
 app.mount("#app")
+
+console.log("✅ App mounted successfully")

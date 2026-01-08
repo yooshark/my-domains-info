@@ -1,13 +1,30 @@
 <script setup lang="ts">
 import { computed } from "vue"
 import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo"
+import { useToast } from "@/composables/useToast"
 
 const { data, isLoading, error } = useDomains()
 const refresh = useRefreshDomains()
+const { showToast } = useToast()
 
 const _isRefreshDisabled = computed(() => {
   return refresh.isPending.value
 })
+
+function _handleRefresh() {
+  refresh.mutate(undefined, {
+    onSuccess: () => {
+      // Query will automatically refetch due to invalidation
+    },
+    onError: (error) => {
+      const errorMessage =
+        (error as Error & { detail?: string })?.detail ||
+        error.message ||
+        "Failed to refresh domains"
+      showToast(errorMessage, "error")
+    },
+  })
+}
 </script>
 
 <template>
@@ -17,7 +34,7 @@ const _isRefreshDisabled = computed(() => {
       <button
           class="btn"
           :disabled="isRefreshDisabled"
-          @click="refresh.mutate()"
+          @click="handleRefresh"
       >
         🔄 Обновить
       </button>

@@ -3,9 +3,17 @@ import { computed } from "vue"
 import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo"
 import { useToast } from "@/composables/useToast"
 
+console.log("🏠 HomeView: Component setup starting...")
+
 const { data: domains, isLoading, error } = useDomains()
 const refreshMutation = useRefreshDomains()
 const { showToast } = useToast()
+
+console.log("🏠 HomeView: Setup complete", {
+  domains: domains.value,
+  isLoading: isLoading.value,
+  error: error.value,
+})
 
 const _isRefreshDisabled = computed(() => {
   return refreshMutation.isPending.value

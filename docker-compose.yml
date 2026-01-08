@@ -7,14 +7,14 @@ services:
     container_name: my-domains-backend
     restart: always
     env_file:
-      - .env
+      - .env.stage
     ports:
-      - "8000:8000"
+      - "8001:8001"
     networks:
       - my-domains-net
 
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/utils/health-check/" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8001/api/utils/health-check/" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -25,7 +25,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${DOMAIN?Variable not set}
+        VITE_API_URL: ${DOMAIN?Variable not set}/api
     container_name: my-domains-frontend
     restart: always
     depends_on:
