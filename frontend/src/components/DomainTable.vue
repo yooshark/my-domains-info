@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import type { DomainInfo } from "@/types/domain";
+import { computed } from "vue"
+import type { DomainInfo } from "@/types/domain"
 
 interface Props {
-	domains?: DomainInfo[];
-	items?: DomainInfo[];
+  domains?: DomainInfo[]
+  items?: DomainInfo[]
 }
 
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
-const _domains = computed(() => props.domains ?? props.items ?? []);
+const _domains = computed(() => props.domains ?? props.items ?? [])
 
 function _getSubdomains(domain: DomainInfo): string[] {
-	return domain.subdomains?.subdomains ?? [];
+  return domain.subdomains?.subdomains ?? []
 }
 </script>
 

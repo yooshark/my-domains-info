@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo";
+import { computed } from "vue"
+import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo"
 
-const { data, isLoading, error } = useDomains();
-const _refresh = useRefreshDomains();
+const { data, isLoading, error } = useDomains()
+const refresh = useRefreshDomains()
+
+const _isRefreshDisabled = computed(() => {
+  return refresh.isPending.value
+})
 </script>
 
 <template>
@@ -11,7 +16,7 @@ const _refresh = useRefreshDomains();
       <AddDomainModal/>
       <button
           class="btn"
-          :disabled="refresh.isPending"
+          :disabled="isRefreshDisabled"
           @click="refresh.mutate()"
       >
         🔄 Обновить

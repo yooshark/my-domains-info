@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo";
-import { useToast } from "@/composables/useToast";
+import { computed } from "vue"
+import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo"
+import { useToast } from "@/composables/useToast"
 
-const { data: domains, isLoading, error } = useDomains();
-const refreshMutation = useRefreshDomains();
-const { showToast } = useToast();
+const { data: domains, isLoading, error } = useDomains()
+const refreshMutation = useRefreshDomains()
+const { showToast } = useToast()
 
 const _isRefreshDisabled = computed(() => {
-	return refreshMutation.isPending.value;
-});
+  return refreshMutation.isPending.value
+})
 
 const _refreshButtonText = computed(() => {
-	return refreshMutation.isPending.value ? "Refreshing..." : "Refresh Info";
-});
+  return refreshMutation.isPending.value ? "Refreshing..." : "Refresh Info"
+})
 
 function _handleRefresh() {
-	refreshMutation.mutate(undefined, {
-		onSuccess: () => {
-			// Query will automatically refetch due to invalidation
-		},
-		onError: (error) => {
-			const errorMessage =
-				(error as Error & { detail?: string })?.detail ||
-				error.message ||
-				"Failed to refresh domains";
-			showToast(errorMessage, "error");
-		},
-	});
+  refreshMutation.mutate(undefined, {
+    onSuccess: () => {
+      // Query will automatically refetch due to invalidation
+    },
+    onError: (error) => {
+      const errorMessage =
+        (error as Error & { detail?: string })?.detail ||
+        error.message ||
+        "Failed to refresh domains"
+      showToast(errorMessage, "error")
+    },
+  })
 }
 </script>
 

@@ -1,8 +1,9 @@
 from typing import TypeVar
 
-from db.models.base import Base
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+from app.db.models.base import Base
 
 TModel = TypeVar("TModel", bound=Base)
 TSchema = TypeVar("TSchema", bound=BaseModel)
