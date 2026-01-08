@@ -18,30 +18,17 @@ COPY --from=ghcr.io/astral-sh/uv:0.9.22 /uv /uvx /bin/
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#using-the-environment
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Install dependencies
-# Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
-#RUN --mount=type=cache,target=/root/.cache/uv \
-#    --mount=type=bind,source=uv.lock,target=uv.lock \
-#    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-#    uv sync --frozen --no-install-project
 
 ENV PYTHONPATH=/app
 
 COPY ./bin ./bin/
 RUN ["chmod", "+x", "bin/entrypoint.sh"]
 
-#COPY ./pyproject.toml ./uv.lock ./alembic.ini /app/
 COPY pyproject.toml uv.lock alembic.ini ./
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project
 
-#COPY ./app /app/app
-#
-## Sync the project
-## Ref: https://docs.astral.sh/uv/guides/integration/docker/#intermediate-layers
-#RUN --mount=type=cache,target=/root/.cache/uv \
-#    uv sync
 
 COPY app ./app
 COPY bin ./bin

@@ -8,16 +8,7 @@
     }
   },
   "files": {
-    "includes": [
-      "**",
-      "!**/dist/**/*",
-      "!**/node_modules/**/*",
-      "!**/src/routeTree.gen.ts",
-      "!**/src/client/**/*",
-      "!**/src/components/ui/**/*",
-      "!**/playwright-report",
-      "!**/playwright.config.ts"
-    ]
+    "includes": ["**", "!**/dist/**/*", "!**/node_modules/**/*"]
   },
   "linter": {
     "enabled": true,
@@ -30,7 +21,8 @@
       "correctness": {
         "useExhaustiveDependencies": "off",
         "useHookAtTopLevel": "off",
-        "noUnusedVariables": "off"
+        "noUnusedVariables": "off",
+        "noUnusedImports": "off"
       },
       "style": {
         "noNonNullAssertion": "off",

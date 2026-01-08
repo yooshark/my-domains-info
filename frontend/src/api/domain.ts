@@ -17,9 +17,7 @@ function getApiUrl(): string {
 
 const API_URL = getApiUrl()
 
-
 export async function fetchDomains(): Promise<DomainInfo[]> {
-
   try {
     const res = await fetch(`${API_URL}/domain-info/`)
     if (!res.ok) {

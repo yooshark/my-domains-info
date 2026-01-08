@@ -9,7 +9,6 @@ const { data: domains, isLoading, error } = useDomains()
 const refreshMutation = useRefreshDomains()
 const { showToast } = useToast()
 
-
 const isRefreshDisabled = computed(() => {
   return refreshMutation.isPending.value
 })
