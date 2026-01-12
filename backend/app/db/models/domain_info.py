@@ -8,7 +8,8 @@ class DomainInfo(Base):
     __tablename__ = "domain_info"
 
     domain_name: Mapped[str] = mapped_column(unique=True, nullable=False)
-    subdomains: Mapped[JSON | None] = mapped_column(type_=JSON, nullable=True)
+
+    dns_settings: Mapped[JSON | None] = mapped_column(type_=JSON, nullable=True)
 
     ip_address: Mapped[str | None] = mapped_column(nullable=True)
 

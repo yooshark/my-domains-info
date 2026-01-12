@@ -1,6 +1,6 @@
 from typing import Any
 
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.db.models.domain_info import DomainInfo
@@ -25,20 +25,34 @@ class DomainInfoRepository(BaseRepository):
             )
             return result.all()
 
-    async def get_domains_info(self) -> list[DomainInfo] | None:
+    async def get_domains_info(
+        self,
+        limit: int,
+        offset: int,
+    ) -> tuple[int, list[DomainInfo]]:
         async with self.session_factory() as session:
-            result = await session.execute(select(self.model))
-            return list(result.scalars())
+            total = await session.scalar(select(func.count()).select_from(self.model))
 
-    async def add_domain_info(self, model_data: dict[str, Any]) -> DomainInfo:
-        domain_info = self.model(**model_data)
+            result = await session.execute(
+                select(self.model).limit(limit).offset(offset)
+            )
+            return total, list(result.scalars())
 
+    async def add_domain_info(self, data: dict[str, Any]) -> DomainInfo:
+        obj = self.model(**data)
         async with self.session_factory() as session:
-            session.add(domain_info)
+            session.add(obj)
             await session.commit()
-            await session.refresh(domain_info)
+            await session.refresh(obj)
 
-        return domain_info
+        return obj
+
+    async def bulk_insert(self, data: list[dict[str, Any]]) -> list[DomainInfo]:
+        objects = [self.model(**item) for item in data]
+        async with self.session_factory() as session:
+            session.add_all(objects)
+            await session.commit()
+            return objects
 
     async def update_domains_info(self, data: list[dict[str, Any]]) -> None:
         async with self.session_factory() as session:
