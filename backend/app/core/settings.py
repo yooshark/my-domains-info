@@ -7,7 +7,7 @@ from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ENV_FILE = Path.cwd() / ".env"
-BASE_DIR = Path(__file__).resolve().parents[2]  # backend/
+BASE_DIR = Path(__file__).resolve().parents[2]
 
 
 class InjectableSettings(BaseSettings):
@@ -49,7 +49,7 @@ class AppSettings(InjectableSettings):
     def get_prod_settings() -> dict[str, Any]:
         return {
             "host": "0.0.0.0",
-            "port": 80,
+            "port": 8001,
         }
 
 

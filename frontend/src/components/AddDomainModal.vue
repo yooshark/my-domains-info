@@ -1,36 +1,36 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { useAddDomain } from "@/composables/useDomainInfo";
-import { useToast } from "@/composables/useToast";
+import { computed, ref } from "vue"
+import { useAddDomain } from "@/composables/useDomainInfo"
+import { useToast } from "@/composables/useToast"
 
-const domain = ref("");
-const add = useAddDomain();
-const { showToast } = useToast();
+const domain = ref("")
+const add = useAddDomain()
+const { showToast } = useToast()
 
-const _isDisabled = computed(() => {
-	return add.isPending.value;
-});
+const isDisabled = computed(() => {
+  return add.isPending.value
+})
 
-const _buttonText = computed(() => {
-	return add.isPending.value ? "Adding..." : "Add Domain";
-});
+const buttonText = computed(() => {
+  return add.isPending.value ? "Adding..." : "Add Domain"
+})
 
-function _handleAdd() {
-	const trimmed = domain.value.trim();
-	if (!trimmed) return;
+function handleAdd() {
+  const trimmed = domain.value.trim()
+  if (!trimmed) return
 
-	add.mutate(trimmed, {
-		onSuccess: () => {
-			domain.value = "";
-		},
-		onError: (error) => {
-			const errorMessage =
-				(error as Error & { detail?: string })?.detail ||
-				error.message ||
-				"Failed to add domain";
-			showToast(errorMessage, "error");
-		},
-	});
+  add.mutate(trimmed, {
+    onSuccess: () => {
+      domain.value = ""
+    },
+    onError: (error) => {
+      const errorMessage =
+        (error as Error & { detail?: string })?.detail ||
+        error.message ||
+        "Failed to add domain"
+      showToast(errorMessage, "error")
+    },
+  })
 }
 </script>
 

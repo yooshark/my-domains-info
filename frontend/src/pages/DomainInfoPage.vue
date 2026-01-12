@@ -1,8 +1,32 @@
 <script setup lang="ts">
-import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo";
+import { computed } from "vue"
+import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo"
+import { useToast } from "@/composables/useToast"
+import AddDomainModal from "@/components/AddDomainModal.vue"
+import DomainTable from "@/components/DomainTable.vue"
 
-const { data, isLoading, error } = useDomains();
-const _refresh = useRefreshDomains();
+const { data, isLoading, error } = useDomains()
+const refresh = useRefreshDomains()
+const { showToast } = useToast()
+
+const isRefreshDisabled = computed(() => {
+  return refresh.isPending.value
+})
+
+function handleRefresh() {
+  refresh.mutate(undefined, {
+    onSuccess: () => {
+      // Query will automatically refetch due to invalidation
+    },
+    onError: (error) => {
+      const errorMessage =
+        (error as Error & { detail?: string })?.detail ||
+        error.message ||
+        "Failed to refresh domains"
+      showToast(errorMessage, "error")
+    },
+  })
+}
 </script>
 
 <template>
@@ -11,8 +35,8 @@ const _refresh = useRefreshDomains();
       <AddDomainModal/>
       <button
           class="btn"
-          :disabled="refresh.isPending"
-          @click="refresh.mutate()"
+          :disabled="isRefreshDisabled"
+          @click="handleRefresh"
       >
         🔄 Обновить
       </button>
@@ -20,7 +44,7 @@ const _refresh = useRefreshDomains();
 
     <DomainTable
         v-if="data"
-        :items="data"
+        :domains="data"
     />
 
     <p v-if="isLoading">Загрузка…</p>
