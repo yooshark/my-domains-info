@@ -22,7 +22,8 @@ export async function fetchDomains(
   limit = 25,
 ): Promise<PaginatedDomainsResponse> {
   const offset = (page - 1) * limit
-  const url = new URL(`${API_URL}/domain-info/`)
+  const url = new URL(`${API_URL}/domain-info/`, location.origin)
+
   url.searchParams.set("limit", limit.toString())
   url.searchParams.set("offset", offset.toString())
 
