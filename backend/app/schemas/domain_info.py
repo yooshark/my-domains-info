@@ -1,3 +1,4 @@
+import socket
 from typing import Literal
 
 from fastapi import HTTPException
@@ -15,6 +16,10 @@ class DomainInfoCreate(BaseModel):
         domain = normalize_domain(v)
         if not domain:
             raise HTTPException(status_code=400, detail="Domain name cannot be empty")
+        try:
+            socket.gethostbyname(domain)
+        except socket.gaierror:
+            raise HTTPException(status_code=400, detail="Domain name not found")
         return domain
 
 

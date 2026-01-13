@@ -1,5 +1,3 @@
-import socket
-
 import httpx
 from aioinject import Injected
 from aioinject.ext.fastapi import inject
@@ -37,15 +35,6 @@ async def add_domain(data: DomainInfoCreate, service: Injected[DomainInfoService
         return await service.add_domain(data.domain_name)
     except HTTPException as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.detail)
-    except socket.gaierror:
-        message = (
-            f"Failed to determine IP for the address: {data.domain_name}\n\n"
-            "Possible reasons:\n"
-            "• the domain does not exist\n"
-            "• the domain is entered incorrectly\n"
-            "• the DNS server did not respond"
-        )
-        raise HTTPException(status_code=400, detail=message)
     except httpx.HTTPStatusError as exc:
         raise HTTPException(status_code=400, detail=exc.response.json())
 
