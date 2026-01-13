@@ -5,6 +5,7 @@ from collections.abc import AsyncIterator
 import fastapi
 from aioinject.ext.fastapi import AioInjectMiddleware
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
 
 from app.adapters.api.main import api_router
 from app.core import di, settings
@@ -41,5 +42,6 @@ def new_server(
         allow_headers=["*"],
     )
     app.include_router(api_router)
-
+    if not app_cfg.DEVELOP:
+        app.mount("/", StaticFiles(directory="static", html=True), name="frontend")
     return app

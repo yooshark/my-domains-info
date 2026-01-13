@@ -1,3 +1,5 @@
+from typing import Literal
+
 from fastapi import HTTPException
 from pydantic import BaseModel, field_validator
 
@@ -32,3 +34,7 @@ class DomainInfoRead(BaseModel):
 class DomainInfoResponse(BaseModel):
     items: list[DomainInfoRead]
     total: int
+
+
+class RefreshResponse(BaseModel):
+    status: Literal["ok"]

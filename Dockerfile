@@ -10,16 +10,21 @@ RUN npm install
 
 COPY frontend/ .
 
-ARG VITE_API_URL=/api
-ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_API_URL=http://localhost:80/api
+ENV VITE_API_URL=${VITE_API_URL}
 
 RUN npm run build
 
 
 ############################
-# Stage 2 — Backend builder
+# Stage 2 — Python runtime
 ############################
-FROM python:3.12-slim AS backend-builder
+FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    # ... add more packages as needed
+    && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -28,9 +33,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY --from=ghcr.io/astral-sh/uv:0.9.22 /uv /uvx /bin/
-ENV PATH="/app/.venv/bin:$PATH"
-
 COPY backend/pyproject.toml backend/uv.lock backend/alembic.ini ./
 
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -38,43 +40,14 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY backend/app ./app
 COPY backend/bin ./bin
-RUN chmod +x bin/entrypoint.sh
 
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync
+COPY --from=frontend-builder /static ./static
 
 
-############################
-# Stage 3 — Runtime (FINAL)
-############################
-FROM python:3.12-slim
-
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
-
-WORKDIR /app
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-       nginx curl supervisor \
-    && rm -rf /var/lib/apt/lists/*
-
-# Supervisord config
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# Backend
-COPY --from=backend-builder /app /app
-ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
-# Frontend static
-RUN mkdir -p /usr/share/nginx/html
-COPY --from=frontend-builder /frontend/dist /usr/share/nginx/html
+ENV PATH="/app/.venv/bin:$PATH"
 
-RUN rm -f /etc/nginx/sites-enabled/default /etc/nginx/sites-available/default
-COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
-COPY nginx/nginx-backend-not-found.conf /etc/nginx/extra-conf.d/backend-not-found.conf
+RUN chmod +x bin/entrypoint.sh
 
-EXPOSE 80
-
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+ENTRYPOINT ["bin/entrypoint.sh"]

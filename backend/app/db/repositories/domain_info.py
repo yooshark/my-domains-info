@@ -1,8 +1,9 @@
 from typing import Any
 
-from sqlalchemy import func, select, update
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.core.enums import DomainTypes
 from app.db.models.domain_info import DomainInfo
 from app.db.repositories.base import BaseRepository
 
@@ -16,7 +17,7 @@ class DomainInfoRepository(BaseRepository):
             result = await session.execute(
                 select(self.model).where(DomainInfo.domain_name == domain_name)
             )
-            return result.scalars().first()
+            return result.scalar_one_or_none()
 
     async def get_domain_names(self) -> list[tuple[int, str]]:
         async with self.session_factory() as session:
@@ -24,6 +25,15 @@ class DomainInfoRepository(BaseRepository):
                 select(self.model.id, self.model.domain_name)
             )
             return result.all()
+
+    async def get_root_domain_names(self) -> list[tuple[int, str]]:
+        async with self.session_factory() as session:
+            result = await session.execute(
+                select(self.model.domain_name).where(
+                    self.model.domain_type == DomainTypes.ROOT
+                )
+            )
+            return result.scalars().all()
 
     async def get_domains_info(
         self,
@@ -56,5 +66,6 @@ class DomainInfoRepository(BaseRepository):
 
     async def update_domains_info(self, data: list[dict[str, Any]]) -> None:
         async with self.session_factory() as session:
-            await session.execute(update(self.model), data)
+            for item in data:
+                await session.merge(self.model(**item))
             await session.commit()

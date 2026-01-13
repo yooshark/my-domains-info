@@ -49,7 +49,7 @@ class AppSettings(InjectableSettings):
     def get_prod_settings() -> dict[str, Any]:
         return {
             "host": "0.0.0.0",
-            "port": 8001,
+            "port": 80,
         }
 
 
