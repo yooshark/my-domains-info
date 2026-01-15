@@ -8,7 +8,7 @@ import tldextract
 from fastapi import HTTPException
 
 from app.core.enums import DomainTypes
-from app.db.models import DomainInfo
+from app.db.models.domain_info import DomainInfo
 from app.db.repositories.domain_info import DomainInfoRepository
 from app.infrastructure.crt_sh_client import CrtShClient
 from app.infrastructure.ipinfo_client import IpInfoClient
@@ -62,7 +62,7 @@ class DomainInfoService:
         data = await self.crt_sh_cl.get_subdomains(domain)
         subs = set()
         for item in data:
-            name = item["name_value"]
+            name: str = item["name_value"]
             for sub in name.split("\n"):
                 if sub.endswith(domain):
                     subs.add(sub.lower())
@@ -94,16 +94,16 @@ class DomainInfoService:
         tasks = [self.collect_domain_info({"domain_name": d}) for d in domains]
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        valid_results = []
+        valid_results: list[dict[str, Any]] = []
 
         for domain, result in zip(domains, results, strict=True):
+            if isinstance(result, dict):
+                valid_results.append(result)
             if isinstance(result, Exception):
                 logger.warning(
                     "Failed to collect",
                     extra={"domain": domain, "result": repr(result)},
                 )
-                continue
-            valid_results.append(result)
         return await self.repo.bulk_insert(valid_results)
 
     async def add_domain(self, domain_name: str) -> list[DomainInfo]:
@@ -116,7 +116,7 @@ class DomainInfoService:
         self,
         limit: int,
         offset: int,
-    ) -> tuple[int, list[DomainInfo]]:
+    ) -> tuple[int | None, list[DomainInfo]]:
         return await self.repo.get_domains_info(limit=limit, offset=offset)
 
     async def refresh_domains_info(self) -> dict[str, str]:
@@ -125,21 +125,18 @@ class DomainInfoService:
             return {"status": "ok"}
 
         rows = await self.repo.get_domain_names()
-        domains = {domain: id_ for id_, domain in rows}
+        domains: dict[str, int] = {domain: id_ for id_, domain in rows}
 
-        results = await asyncio.gather(
+        root_domains_results = await asyncio.gather(
             *(self.get_target_domains(d) for d in root_domains),
             return_exceptions=True,
         )
 
-        domains_to_update = set()
-        skipped_targets = 0
+        domains_to_update: set[str] = set()
 
-        for res in results:
-            if isinstance(res, Exception):
-                skipped_targets += 1
-                continue
-            domains_to_update.update(res)
+        for res in root_domains_results:
+            if isinstance(res, list):
+                domains_to_update.update(res)
 
         if not domains_to_update:
             return {"status": "ok"}
@@ -149,22 +146,22 @@ class DomainInfoService:
             for d in domains_to_update
         ]
 
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        results: list[dict[str, Any] | BaseException] = await asyncio.gather(
+            *tasks, return_exceptions=True
+        )
 
-        valid_results = []
-        skipped_domains = 0
+        valid_results: list[dict[str, Any]] = []
 
         for domain, result in zip(domains_to_update, results, strict=True):
+            if isinstance(result, dict):
+                valid_results.append(result)
             if isinstance(result, Exception):
-                skipped_domains += 1
                 logger.warning(
                     "Failed to refresh domain",
                     extra={"domain": domain, "result": repr(result)},
                 )
-                continue
-            valid_results.append(result)
 
         if not valid_results:
-            return {"status": "ok", "updated": 0, "skipped": skipped_domains}
+            return {"status": "ok"}
         await self.repo.update_domains_info(data=valid_results)
         return {"status": "ok"}

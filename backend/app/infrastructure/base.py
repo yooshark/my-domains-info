@@ -9,7 +9,7 @@ class BaseRequestsClient:
 
     async def _request(
         self, method: str, path: str, params: dict[str, Any] | None
-    ) -> dict[str, Any]:
+    ) -> Any:
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             r = await client.request(method, path, params=params)
             r.raise_for_status()
@@ -17,11 +17,11 @@ class BaseRequestsClient:
 
     async def get(
         self, added_path: str = "", params: dict[str, Any] | None = None
-    ) -> dict[str, Any]:
+    ) -> Any:
         path = self.base_url
         if added_path:
             path = f"{path}/{added_path}"
         return await self._request("GET", path, params)
 
-    async def get_ip_info(self, ip: str) -> dict[str, Any]:
+    async def get_ip_info(self, ip: str) -> Any:
         return await self.get(added_path=ip)

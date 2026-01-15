@@ -16,3 +16,4 @@ htmlcov
 .idea
 .ruff_cache
 db.sqlite3
+tests
