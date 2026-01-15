@@ -7,7 +7,7 @@ from app.db.models.base import Base
 TModel = TypeVar("TModel", bound=Base)
 
 
-class BaseRepository(TModel):
+class BaseRepository(TModel):  # type: ignore
     def __init__(
         self, session_factory: async_sessionmaker[AsyncSession], model: type[TModel]
     ) -> None:
