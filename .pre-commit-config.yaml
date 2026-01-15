@@ -25,7 +25,6 @@ repos:
         require_serial: true
         language: unsupported
         types: [ python ]
-#        files: ^backend/
 
       - id: local-ruff-format
         name: ruff format
