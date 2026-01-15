@@ -53,7 +53,7 @@ class TestResolveIp:
             called_with["host"] = host
             return "1.2.3.4"
 
-        async def fake_to_thread(fn, *args, **kwargs):  # type: ignore
+        async def fake_to_thread(fn, *args, **kwargs):
             return fn(*args, **kwargs)
 
         monkeypatch.setattr("socket.gethostbyname", fake_gethostbyname)
@@ -69,7 +69,7 @@ class TestGetDomainType:
         class FakeExtract:
             subdomain = ""
 
-        async def fake_to_thread(fn, *args, **kwargs):  # type: ignore
+        async def fake_to_thread(fn, *args, **kwargs):
             return FakeExtract()
 
         monkeypatch.setattr("tldextract.extract", MagicMock())
@@ -82,7 +82,7 @@ class TestGetDomainType:
         class FakeExtract:
             subdomain = "www"
 
-        async def fake_to_thread(fn, *args, **kwargs):  # type: ignore
+        async def fake_to_thread(fn, *args, **kwargs):
             return FakeExtract()
 
         monkeypatch.setattr("tldextract.extract", MagicMock())
@@ -100,12 +100,12 @@ class TestGetDnsSettings:
             def to_text(self) -> str:
                 return "1.2.3.4"
 
-        def fake_resolve(domain: str, record: str):  # type: ignore
+        def fake_resolve(domain: str, record: str):
             assert domain == "example.com"
             assert record == "A"
             return [FakeAnswer()]
 
-        async def fake_to_thread(fn, *args, **kwargs):  # type: ignore
+        async def fake_to_thread(fn, *args, **kwargs):
             return fake_resolve(*args, **kwargs)
 
         monkeypatch.setattr("dns.resolver.resolve", fake_resolve)
@@ -122,10 +122,10 @@ class TestGetDnsSettings:
         service: DomainInfoService,
         caplog: pytest.LogCaptureFixture,
     ) -> None:
-        def fake_resolve(domain: str, record: str):  # type: ignore
+        def fake_resolve(domain: str, record: str):
             raise RuntimeError("boom")
 
-        async def fake_to_thread(fn, *args, **kwargs):  # type: ignore
+        async def fake_to_thread(fn, *args, **kwargs):
             return fake_resolve(*args, **kwargs)
 
         monkeypatch.setattr("dns.resolver.resolve", fake_resolve)

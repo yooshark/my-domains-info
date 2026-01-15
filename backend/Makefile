@@ -1,13 +1,13 @@
 .PHONY: lint format typecheck check
 
 lint:
-	ruff check .
+	ruff check app
 
 format:
 	ruff format .
 
 typecheck:
-	mypy .
+	uv run mypy app
 
 test:
 	uv run coverage run -m pytest

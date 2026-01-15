@@ -38,7 +38,7 @@ class TestGetDomainsInfoRoute:
             *,
             limit: int,
             offset: int,
-        ) -> tuple[int, list[DomainInfo]]:  # noqa: ARG001
+        ) -> tuple[int, list[DomainInfo]]:
             return 1, [domain]
 
         monkeypatch.setattr(
@@ -64,7 +64,7 @@ class TestAddDomainRoute:
 
         async def fake_add_domain(
             self: DomainInfoService, domain_name: str
-        ) -> list[DomainInfo]:  # noqa: ARG001
+        ) -> list[DomainInfo]:
             return [domain]
 
         monkeypatch.setattr(DomainInfoService, "add_domain", fake_add_domain)
@@ -86,7 +86,7 @@ class TestAddDomainRoute:
     ) -> None:
         async def fake_add_domain(
             self: DomainInfoService, domain_name: str
-        ) -> list[DomainInfo]:  # noqa: ARG001
+        ) -> list[DomainInfo]:
             raise HTTPException(status_code=400, detail="boom")
 
         monkeypatch.setattr(DomainInfoService, "add_domain", fake_add_domain)
@@ -110,7 +110,7 @@ class TestAddDomainRoute:
 
         async def fake_add_domain(
             self: DomainInfoService, domain_name: str
-        ) -> list[DomainInfo]:  # noqa: ARG001
+        ) -> list[DomainInfo]:
             raise httpx.HTTPStatusError("bad", request=request, response=response)
 
         monkeypatch.setattr(DomainInfoService, "add_domain", fake_add_domain)

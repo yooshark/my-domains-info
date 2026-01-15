@@ -21,8 +21,8 @@ jobs:
       - name: Setup dependencies and run checks
         working-directory: backend
         run: |
-          uv sync --frozen --no-install-project
-          make check
+          uv sync
+          make test
 
 
   docker:

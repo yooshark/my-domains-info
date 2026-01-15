@@ -113,7 +113,7 @@ def add_fixture_dynamically(
         injected_type = args[0]
 
         # Wire pytest fixture for this parameter name
-        request._fixturemanager._arg2fixturedefs[parameter.name] = [  # noqa: SLF001
+        request._fixturemanager._arg2fixturedefs[parameter.name] = [
             pytest.FixtureDef(
                 argname=parameter.name,
                 func=make_fixture(aioinject_context, injected_type),
