@@ -21,11 +21,11 @@ repos:
 
       - id: local-ruff-check
         name: ruff check
-        entry: uv run ruff check app --force-exclude --fix --exit-non-zero-on-fix
+        entry: uv run ruff check backend/app --force-exclude --fix --exit-non-zero-on-fix
         require_serial: true
         language: unsupported
         types: [ python ]
-        files: ^backend/
+#        files: ^backend/
 
       - id: local-ruff-format
         name: ruff format
