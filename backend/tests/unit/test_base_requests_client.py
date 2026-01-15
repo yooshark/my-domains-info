@@ -10,7 +10,7 @@ class TestClient(BaseRequestsClient):
 
 
 async def test_get_success(monkeypatch: pytest.MonkeyPatch) -> None:
-    async def fake_request(self, method, path, params):
+    async def fake_request(self, method, path, params):  # noqa: ARG001
         class Resp:
             def raise_for_status(self) -> None: ...
 
@@ -28,7 +28,7 @@ async def test_get_success(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 async def test_get_http_error(monkeypatch: pytest.MonkeyPatch) -> None:
-    async def fake_request(self, method, path, params):
+    async def fake_request(self, method, path, params):  # noqa: ARG001
         raise httpx.HTTPStatusError(
             "boom",
             request=httpx.Request("GET", path),
@@ -44,16 +44,11 @@ async def test_get_http_error(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 async def test_get_ip_info(monkeypatch: pytest.MonkeyPatch) -> None:
-    async def fake_request(self, method, path, params):
+    async def fake_request(self, method, path, params):  # noqa: ARG001
         class Resp:
             def raise_for_status(self) -> None: ...
 
-            def json(self
-
-
-
-
-                     ) -> dict[str, str]:
+            def json(self) -> dict[str, str]:
                 return {"ip": "1.2.3.4"}
 
         return Resp()
