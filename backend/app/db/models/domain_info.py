@@ -1,6 +1,8 @@
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.types import JSON
 
+from app.core.enums import DomainTypes
 from app.db.models.base import Base
 
 
@@ -8,7 +10,16 @@ class DomainInfo(Base):
     __tablename__ = "domain_info"
 
     domain_name: Mapped[str] = mapped_column(unique=True, nullable=False)
-    subdomains: Mapped[JSON | None] = mapped_column(type_=JSON, nullable=True)
+    domain_type: Mapped[DomainTypes] = mapped_column(
+        SQLEnum(
+            DomainTypes,
+            name="domaintype",
+            values_callable=lambda enum: [e.value for e in enum],
+        ),
+        nullable=False,
+        server_default=DomainTypes.SUBDOMAIN,
+    )
+    dns_settings: Mapped[JSON | None] = mapped_column(type_=JSON, nullable=True)
 
     ip_address: Mapped[str | None] = mapped_column(nullable=True)
 

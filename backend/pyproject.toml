@@ -7,18 +7,24 @@ dependencies = [
     "aioinject>=1.10.2",
     "aiosqlite>=0.22.1",
     "alembic>=1.17.2",
+    "dnspython>=2.8.0",
     "fastapi>=0.128.0",
     "httpx>=0.28.1",
     "pre-commit>=4.5.1",
     "pydantic-settings>=2.12.0",
     "python-dotenv>=1.2.1",
     "sqlalchemy>=2.0.45",
+    "tldextract>=5.3.1",
     "uvicorn>=0.40.0",
 ]
 
 [tool.uv]
 dev-dependencies = [
     "ruff>=0.14.10",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0",
+    "pytest-cov>=7.0.0",
+    "mypy>=1.19.1",
 ]
 
 [tool.ruff]
@@ -41,4 +47,24 @@ ignore = [
     "B008", # do not perform function calls in argument defaults
     "W191", # indentation contains tabs
     "B904", # Allow raising exceptions without from e, for HTTPException
+]
+
+[tool.mypy]
+strict = true
+exclude = ["venv", ".venv", "alembic"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+omit = [
+    "*/aioinject_*",
+    "*/.venv/*",
+    "*/tests/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
 ]

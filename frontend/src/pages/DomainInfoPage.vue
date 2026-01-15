@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import { useDomains, useRefreshDomains } from "@/composables/useDomainInfo"
 import { useToast } from "@/composables/useToast"
 import AddDomainModal from "@/components/AddDomainModal.vue"
 import DomainTable from "@/components/DomainTable.vue"
 
-const { data, isLoading, error } = useDomains()
+const currentPage = ref(1)
+const { data: domainsData, isLoading, error } = useDomains(currentPage)
 const refresh = useRefreshDomains()
 const { showToast } = useToast()
+
+const domains = computed(() => domainsData.value?.items ?? [])
+const totalPages = computed(() =>
+  Math.ceil((domainsData.value?.total ?? 0) / 25),
+)
 
 const isRefreshDisabled = computed(() => {
   return refresh.isPending.value
@@ -27,6 +33,10 @@ function handleRefresh() {
     },
   })
 }
+
+function handlePageChange(page: number) {
+  currentPage.value = page
+}
 </script>
 
 <template>
@@ -43,8 +53,11 @@ function handleRefresh() {
     </div>
 
     <DomainTable
-        v-if="data"
-        :domains="data"
+        v-if="domains.length > 0 || !isLoading"
+        :domains="domains"
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        @page-change="handlePageChange"
     />
 
     <p v-if="isLoading">Загрузка…</p>

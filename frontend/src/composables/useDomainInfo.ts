@@ -1,21 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query"
 import { addDomain, fetchDomains, refreshDomains } from "@/api/domain"
-import type { DomainInfo } from "@/types/domain"
+import type { PaginatedDomainsResponse } from "@/types/domain"
+import { ref } from "vue"
 
-export function useDomains() {
+export function useDomains(page = ref(1)) {
   if (import.meta.env.DEV) {
     console.log("📡 useDomains: Setting up query...")
   }
-  return useQuery<DomainInfo[]>({
-    queryKey: ["domains"],
+  return useQuery<PaginatedDomainsResponse>({
+    queryKey: ["domains", page],
     queryFn: async () => {
       if (import.meta.env.DEV) {
-        console.log("📡 useDomains: Fetching domains...")
+        console.log("📡 useDomains: Fetching domains page", page.value)
       }
       try {
-        const result = await fetchDomains()
+        const result = await fetchDomains(page.value, 25)
         if (import.meta.env.DEV) {
-          console.log("✅ useDomains: Fetched", result.length, "domains")
+          console.log(
+            "✅ useDomains: Fetched",
+            result.items.length,
+            "domains (total:",
+            result.total,
+            ")",
+          )
         }
         return result
       } catch (error) {
@@ -31,7 +38,7 @@ export function useDomains() {
 export function useAddDomain() {
   const qc = useQueryClient()
 
-  return useMutation<DomainInfo, Error, string>({
+  return useMutation({
     mutationFn: addDomain,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["domains"] })

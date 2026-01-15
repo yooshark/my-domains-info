@@ -1,4 +1,4 @@
-import type { DomainInfo } from "@/types/domain"
+import type { DomainInfo, PaginatedDomainsResponse } from "@/types/domain"
 
 interface ErrorResponse {
   detail?: string
@@ -17,9 +17,22 @@ function getApiUrl(): string {
 
 const API_URL = getApiUrl()
 
-export async function fetchDomains(): Promise<DomainInfo[]> {
+export async function fetchDomains(
+  page = 1,
+  limit = 25,
+): Promise<PaginatedDomainsResponse> {
+  const offset = (page - 1) * limit
+  const url = new URL(`${API_URL}/domain-info/`, location.origin)
+
+  url.searchParams.set("limit", limit.toString())
+  url.searchParams.set("offset", offset.toString())
+
+  if (import.meta.env.DEV) {
+    console.log("🌐 fetchDomains: Calling API at", url.toString())
+  }
+
   try {
-    const res = await fetch(`${API_URL}/domain-info/`)
+    const res = await fetch(url.toString())
     if (!res.ok) {
       let errorMessage = "Failed to load domains"
       try {
@@ -31,7 +44,7 @@ export async function fetchDomains(): Promise<DomainInfo[]> {
       }
       throw new Error(errorMessage)
     }
-    return (await res.json()) as DomainInfo[]
+    return (await res.json()) as PaginatedDomainsResponse
   } catch (error) {
     if (error instanceof Error) {
       throw error

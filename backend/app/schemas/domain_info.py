@@ -1,3 +1,6 @@
+import socket
+from typing import Literal
+
 from fastapi import HTTPException
 from pydantic import BaseModel, field_validator
 
@@ -13,6 +16,10 @@ class DomainInfoCreate(BaseModel):
         domain = normalize_domain(v)
         if not domain:
             raise HTTPException(status_code=400, detail="Domain name cannot be empty")
+        try:
+            socket.gethostbyname(domain)
+        except socket.gaierror:
+            raise HTTPException(status_code=400, detail="Domain name not found")
         return domain
 
 
@@ -20,9 +27,19 @@ class DomainInfoRead(BaseModel):
     domain_name: str
     ip_address: str | None = None
 
-    subdomains: dict[str, list[str]] | None = None
     geo_city: str | None = None
     geo_country: str | None = None
     network_owner_name: str | None = None
     is_anycast_node: bool
     is_active: bool | None = None
+
+    dns_settings: dict[str, list[str]] | None = None
+
+
+class DomainInfoResponse(BaseModel):
+    items: list[DomainInfoRead]
+    total: int
+
+
+class RefreshResponse(BaseModel):
+    status: Literal["ok"]

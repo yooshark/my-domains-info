@@ -9,7 +9,7 @@ class CrtShClient(BaseRequestsClient):
         self.base_url = cfg.BASE_URL
         self.timeout = cfg.TIMEOUT
 
-    async def get_subdomains(self, domain: str) -> dict[str, Any]:
+    async def get_subdomains(self, domain: str) -> Any:
         return await self.get(
             params={
                 "q": domain,

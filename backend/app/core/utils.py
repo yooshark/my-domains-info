@@ -2,7 +2,7 @@ from urllib.parse import urlparse
 
 
 def normalize_domain(value: str) -> str:
-    value = value.strip()
+    value = value.strip().lower().strip(" '\"")
 
     if not value:
         return ""
@@ -17,4 +17,4 @@ def normalize_domain(value: str) -> str:
     host = host.split("@")[-1]
     host = host.split(":")[0]
 
-    return host.lower().strip(" '\"")
+    return host

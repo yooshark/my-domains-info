@@ -1,6 +1,7 @@
 import asyncio
 import contextlib
 import platform
+from typing import Any
 
 import uvicorn
 from fastapi import FastAPI
@@ -14,7 +15,7 @@ async def main() -> None:
         app_settings = await context.resolve(AppSettings)
         app = await context.resolve(FastAPI)
 
-        app_configs = {
+        app_configs: dict[str, Any] = {
             "proxy_headers": True,
             "forwarded_allow_ips": "*",
         }
