@@ -48,7 +48,12 @@ async def test_get_ip_info(monkeypatch: pytest.MonkeyPatch) -> None:
         class Resp:
             def raise_for_status(self) -> None: ...
 
-            def json(self) -> dict[str, str]:
+            def json(self
+
+
+
+
+                     ) -> dict[str, str]:
                 return {"ip": "1.2.3.4"}
 
         return Resp()
