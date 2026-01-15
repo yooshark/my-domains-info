@@ -28,7 +28,7 @@ dev-dependencies = [
 ]
 
 [tool.ruff]
-exclude = ["alembic", "tests"]
+exclude = ["alembic"]
 
 [tool.ruff.lint]
 select = [
