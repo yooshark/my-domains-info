@@ -102,7 +102,7 @@ class DatabaseSettings(InjectableSettings):
     )
 
     DRIVER: str = "sqlite+aiosqlite"
-    NAME: str = "dsds.db.sqlite3"
+    NAME: str = "db.sqlite3"
 
     ECHO: bool = False
     TIMEOUT: int = 5
