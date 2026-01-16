@@ -1,5 +1,7 @@
 # Backend Documentation
 
+[![codecov](https://codecov.io/github/yooshark/my-domains-info/graph/badge.svg?token=UFO08MBNY9)](https://codecov.io/github/yooshark/my-domains-info)
+
 Technical documentation for the My Domains Info backend service.
 
 ## 🏗 Architecture
@@ -7,6 +9,7 @@ Technical documentation for the My Domains Info backend service.
 ### Technology Stack
 
 **Backend:**
+
 - **Framework**: FastAPI (Python 3.12+)
 - **Database**: SQLite with SQLAlchemy ORM
 - **Async Runtime**: AsyncIO with uvloop (Linux)
@@ -16,11 +19,13 @@ Technical documentation for the My Domains Info backend service.
 - **Domain Parsing**: tldextract
 
 **Infrastructure Clients:**
+
 - **crt.sh**: Certificate transparency logs for subdomain discovery
 - **IPWhois**: IP geolocation and network information
 - **IPInfo**: IP information and anycast detection
 
 **Development Tools:**
+
 - **Testing**: pytest + pytest-asyncio + coverage
 - **Linting**: ruff (Python)
 - **Type Checking**: mypy (Python)
@@ -112,6 +117,7 @@ make check         # Run all checks (lint + typecheck + test)
 Create a `.env` file in the project root with the following variables:
 
 #### Application Settings (`APP_*`)
+
 ```bash
 APP_DEBUG=true                    # Enable debug mode
 APP_DEVELOP=true                  # Development mode (disables static file serving)
@@ -122,6 +128,7 @@ APP_ALLOW_ORIGINS=http://localhost:8000  # CORS allowed origins
 ```
 
 #### Database Settings (`DB_*`)
+
 ```bash
 DB_DRIVER=sqlite+aiosqlite        # Database driver
 DB_NAME=db.sqlite3                # Database filename (default: db.sqlite3)
@@ -129,23 +136,27 @@ DB_ECHO=false                     # SQLAlchemy echo mode
 DB_TIMEOUT=5                      # Connection timeout
 ```
 
-> **Note:** The database file is stored in the application directory (`/app` in Docker). Migrations run automatically on container startup.
+> **Note:** The database file is stored in the application directory (`/app` in Docker). Migrations run automatically on
+> container startup.
 
 #### External API Settings
 
 **IPWhois (`API_IP_WHOIS_*`):**
+
 ```bash
 API_IP_WHOIS_BASE_URL=http://ipwho.is/
 API_IP_WHOIS_TIMEOUT=10
 ```
 
 **IPInfo (`API_IP_INFO_*`):**
+
 ```bash
 API_IP_INFO_BASE_URL=https://ipinfo.io
 API_IP_INFO_TIMEOUT=10
 ```
 
 **crt.sh (`API_CRT_SH_*`):**
+
 ```bash
 API_CRT_SH_BASE_URL=https://crt.sh
 API_CRT_SH_TIMEOUT=10
@@ -155,15 +166,16 @@ API_CRT_SH_TIMEOUT=10
 
 ### Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/domain-info/` | Get paginated list of domains |
-| `POST` | `/api/domain-info/` | Add a new domain (discovers subdomains) |
-| `POST` | `/api/domain-info/refresh` | Refresh all domain information |
+| Method | Endpoint                   | Description                             |
+|--------|----------------------------|-----------------------------------------|
+| `GET`  | `/api/domain-info/`        | Get paginated list of domains           |
+| `POST` | `/api/domain-info/`        | Add a new domain (discovers subdomains) |
+| `POST` | `/api/domain-info/refresh` | Refresh all domain information          |
 
 ### Query Parameters
 
 **GET `/api/domain-info/`:**
+
 - `limit` (int, 1-100, default: 25): Number of results per page
 - `offset` (int, >=0, default: 0): Pagination offset
 
@@ -172,6 +184,7 @@ API_CRT_SH_TIMEOUT=10
 #### Add a Domain
 
 **Request:**
+
 ```bash
 POST /api/domain-info/
 Content-Type: application/json
@@ -182,6 +195,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -194,8 +208,13 @@ Content-Type: application/json
     "is_active": true,
     "is_anycast_node": false,
     "dns_settings": {
-      "A": ["93.184.216.34"],
-      "NS": ["a.iana-servers.net", "b.iana-servers.net"]
+      "A": [
+        "93.184.216.34"
+      ],
+      "NS": [
+        "a.iana-servers.net",
+        "b.iana-servers.net"
+      ]
     }
   },
   {
@@ -209,11 +228,13 @@ Content-Type: application/json
 #### Get All Domains (Paginated)
 
 **Request:**
+
 ```bash
 GET /api/domain-info/?limit=25&offset=0
 ```
 
 **Response:**
+
 ```json
 {
   "total": 42,
@@ -226,7 +247,9 @@ GET /api/domain-info/?limit=25&offset=0
       "network_owner_name": "Edgecast Inc",
       "is_active": true,
       "is_anycast_node": false,
-      "dns_settings": {...}
+      "dns_settings": {
+        ...
+      }
     }
   ]
 }
@@ -235,11 +258,13 @@ GET /api/domain-info/?limit=25&offset=0
 #### Refresh All Domains
 
 **Request:**
+
 ```bash
 POST /api/domain-info/refresh
 ```
 
 **Response:**
+
 ```json
 {
   "status": "ok"
@@ -346,9 +371,11 @@ make check
 
 ### Docker Entrypoint Behavior
 
-The Docker entrypoint script (`bin/entrypoint.sh`) automatically runs database migrations on every container startup. This ensures your database schema is always up to date without requiring manual intervention.
+The Docker entrypoint script (`bin/entrypoint.sh`) automatically runs database migrations on every container startup.
+This ensures your database schema is always up to date without requiring manual intervention.
 
 **Entrypoint flow:**
+
 1. Runs `alembic upgrade head` to apply any pending migrations
 2. Starts the FastAPI application
 
@@ -377,7 +404,8 @@ This means you don't need to set any environment variables or run migrations man
      my-domains-info:latest
    ```
 
-   > **Note:** Migrations run automatically on container startup. The database file is stored in `/app` directory, so mounting `/app` will persist your data.
+   > **Note:** Migrations run automatically on container startup. The database file is stored in `/app` directory, so
+   mounting `/app` will persist your data.
 
 ### Docker Compose Configuration
 
@@ -406,31 +434,36 @@ services:
 
 ### Dependency Injection
 
-The project uses `aioinject` for dependency injection. Services and repositories are registered in `app/core/di/container.py` and injected via decorators:
+The project uses `aioinject` for dependency injection. Services and repositories are registered in
+`app/core/di/container.py` and injected via decorators:
 
 ```python
 from aioinject import Injected
 from aioinject.ext.fastapi import inject
 
+
 @router.post("/")
 @inject
 async def add_domain(
-    service: Injected[DomainInfoService]
+        service: Injected[DomainInfoService]
 ) -> list[DomainInfo]:
     return await service.add_domain(data.domain_name)
 ```
 
 ### Repository Pattern
 
-Data access is abstracted through repositories in `app/db/repositories/`. This provides a clean separation between business logic and database operations.
+Data access is abstracted through repositories in `app/db/repositories/`. This provides a clean separation between
+business logic and database operations.
 
 ### Service Layer
 
-Business logic is implemented in services under `app/application/`. Services orchestrate domain operations and coordinate between repositories and infrastructure clients.
+Business logic is implemented in services under `app/application/`. Services orchestrate domain operations and
+coordinate between repositories and infrastructure clients.
 
 ### Infrastructure Clients
 
-External API clients are located in `app/infrastructure/`. These clients handle communication with third-party services like crt.sh, IPWhois, and IPInfo.
+External API clients are located in `app/infrastructure/`. These clients handle communication with third-party services
+like crt.sh, IPWhois, and IPInfo.
 
 ## 🔍 How It Works
 
@@ -440,11 +473,11 @@ External API clients are located in `app/infrastructure/`. These clients handle 
 2. Service validates the domain and checks for duplicates
 3. Service queries crt.sh to discover all subdomains
 4. For each domain/subdomain:
-   - Resolve IP address
-   - Query DNS records (A, AAAA, MX, NS, CNAME, SOA, TXT)
-   - Get geolocation from IPWhois
-   - Get network information from IPInfo
-   - Detect anycast configuration
+    - Resolve IP address
+    - Query DNS records (A, AAAA, MX, NS, CNAME, SOA, TXT)
+    - Get geolocation from IPWhois
+    - Get network information from IPInfo
+    - Detect anycast configuration
 5. Store all information in database
 6. Return results to user
 
@@ -454,8 +487,8 @@ External API clients are located in `app/infrastructure/`. These clients handle 
 2. Service retrieves all root domains from database
 3. Re-queries crt.sh for each root domain to get updated subdomain list
 4. For each domain (existing and new):
-   - Collect fresh information from all sources
-   - Update database records
+    - Collect fresh information from all sources
+    - Update database records
 5. Return success status
 
 ## 🐛 Troubleshooting
