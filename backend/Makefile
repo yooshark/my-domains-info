@@ -12,5 +12,6 @@ typecheck:
 test:
 	uv run coverage run -m pytest
 	uv run coverage report
+	uv run coverage xml
 
 check: lint typecheck test
