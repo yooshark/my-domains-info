@@ -1,0 +1,12 @@
+services:
+  app:
+    image: 'my-domains-app'
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my-domains-info
+    restart: always
+    env_file:
+      - .env.example
+    ports:
+      - "80:80"
