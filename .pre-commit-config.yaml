@@ -12,8 +12,8 @@ repos:
   - repo: local
     hooks:
       - id: local-biome-check
-        name: biome check and fix
-        entry: bash -c 'cd frontend && npm run lint'
+        name: biome check (safe mode)
+        entry: bash -c 'cd frontend && npm run lint:check'
         language: system
         types: [ text ]
         files: ^frontend/

@@ -46,6 +46,11 @@ jobs:
         working-directory: backend
         run: make test
 
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   docker:
     name: Build & Push Docker
     needs: checks
