@@ -17,10 +17,7 @@ function getApiUrl(): string {
 
 const API_URL = getApiUrl()
 
-export async function fetchDomains(
-  page = 1,
-  limit = 25,
-): Promise<PaginatedDomainsResponse> {
+export async function fetchDomains(page = 1, limit = 25): Promise<PaginatedDomainsResponse> {
   const offset = (page - 1) * limit
   const url = new URL(`${API_URL}/domain-info/`, location.origin)
 

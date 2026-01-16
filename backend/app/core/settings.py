@@ -26,6 +26,9 @@ class AppSettings(InjectableSettings):
     DEBUG: bool = True
     DEVELOP: bool = True
 
+    HOST: str = "localhost"
+    PORT: int = 8000
+
     PROJECT_NAME: str = "app"
     VERSION: str = "0.0.1"
     ENVIRONMENT: str = "local"
@@ -35,21 +38,19 @@ class AppSettings(InjectableSettings):
     ]
     ALLOW_ORIGIN_REGEX: str | None = r"https://(.*\.)?localhost\.com"
 
-    FRONTEND_HOST: str = "http://localhost:5173"
-
-    @staticmethod
-    def get_develop_settings() -> dict[str, Any]:
+    @property
+    def develop_settings(self) -> dict[str, Any]:
         return {
-            "host": "localhost",
-            "port": 8000,
+            "host": self.HOST,
+            "port": self.PORT,
             "reload": True,
         }
 
-    @staticmethod
-    def get_prod_settings() -> dict[str, Any]:
+    @property
+    def prod_settings(self) -> dict[str, Any]:
         return {
-            "host": "0.0.0.0",
-            "port": 80,
+            "host": self.HOST,
+            "port": self.PORT,
         }
 
 

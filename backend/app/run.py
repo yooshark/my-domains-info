@@ -1,6 +1,6 @@
 import asyncio
 import contextlib
-import platform
+import sys
 from typing import Any
 
 import uvicorn
@@ -20,11 +20,11 @@ async def main() -> None:
             "forwarded_allow_ips": "*",
         }
         if app_settings.DEVELOP:
-            app_configs |= app_settings.get_develop_settings()
+            app_configs |= app_settings.develop_settings
         else:
-            app_configs |= app_settings.get_prod_settings()
+            app_configs |= app_settings.prod_settings
 
-        if platform.system() == "Linux":
+        if sys.platform.startswith("linux"):
             app_configs["loop"] = "uvloop"
 
         config = uvicorn.Config(

@@ -25,9 +25,7 @@ function handleAdd() {
     },
     onError: (error) => {
       const errorMessage =
-        (error as Error & { detail?: string })?.detail ||
-        error.message ||
-        "Failed to add domain"
+        (error as Error & { detail?: string })?.detail || error.message || "Failed to add domain"
       showToast(errorMessage, "error")
     },
   })
