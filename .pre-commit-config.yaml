@@ -12,8 +12,8 @@ repos:
   - repo: local
     hooks:
       - id: local-biome-check
-        name: biome check (safe mode)
-        entry: bash -c 'cd frontend && npm run lint:check'
+        name: biome check and fix
+        entry: bash -c 'cd frontend && npm run lint'
         language: system
         types: [ text ]
         files: ^frontend/
@@ -21,7 +21,7 @@ repos:
 
       - id: local-ruff-check
         name: ruff check
-        entry: uv run ruff check app --force-exclude --fix --exit-non-zero-on-fix
+        entry: uv run ruff check backend/app --force-exclude --fix --exit-non-zero-on-fix
         require_serial: true
         language: unsupported
         types: [ python ]

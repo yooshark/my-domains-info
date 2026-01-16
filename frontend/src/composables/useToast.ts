@@ -10,10 +10,7 @@ const toasts = ref<Toast[]>([])
 let toastId = 0
 
 export function useToast() {
-  function showToast(
-    message: string,
-    type: "error" | "success" | "info" = "error",
-  ) {
+  function showToast(message: string, type: "error" | "success" | "info" = "error") {
     const id = ++toastId
     const toast: Toast = { id, message, type }
     toasts.value.push(toast)

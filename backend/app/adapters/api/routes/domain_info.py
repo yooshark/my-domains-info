@@ -2,6 +2,7 @@ import httpx
 from aioinject import Injected
 from aioinject.ext.fastapi import inject
 from fastapi import APIRouter, HTTPException, Query
+from starlette import status
 
 from app.application.domain_info import DomainInfoService
 from app.db.models.domain_info import DomainInfo
@@ -39,7 +40,14 @@ async def add_domain(
     except HTTPException as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.detail)
     except httpx.HTTPStatusError as exc:
-        raise HTTPException(status_code=400, detail=exc.response.json())
+        status_code = exc.response.status_code
+        if status_code >= status.HTTP_500_INTERNAL_SERVER_ERROR:
+            detail = (
+                "External service is temporarily unavailable. Please try again later."
+            )
+        else:
+            detail = exc.response.json()
+        raise HTTPException(status_code=400, detail=detail)
 
 
 @router.post("/refresh", response_model=RefreshResponse)

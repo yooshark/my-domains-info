@@ -11,9 +11,7 @@ const refresh = useRefreshDomains()
 const { showToast } = useToast()
 
 const domains = computed(() => domainsData.value?.items ?? [])
-const totalPages = computed(() =>
-  Math.ceil((domainsData.value?.total ?? 0) / 25),
-)
+const totalPages = computed(() => Math.ceil((domainsData.value?.total ?? 0) / 25))
 
 const isRefreshDisabled = computed(() => {
   return refresh.isPending.value
