@@ -485,7 +485,3 @@ If migrations fail:
 2. Verify database connection string
 3. Review migration files for errors
 4. Use `alembic history` to check migration state
-
-## 📝 License
-
-[Specify your license here]

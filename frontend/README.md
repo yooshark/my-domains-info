@@ -475,10 +475,6 @@ When contributing to the frontend:
 5. Test your changes in both development and production builds
 6. Update this documentation if adding new features
 
-## 📝 License
-
-[Specify your license here]
-
 ---
 
 **Built with ❤️ using Vue.js, TypeScript, and modern web technologies**
