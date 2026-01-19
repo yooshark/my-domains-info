@@ -36,7 +36,7 @@ docker run -d \
    -p 80:80 \
    -e APP_HOST=0.0.0.0 \
    -e APP_PORT=80 \
-   -e VITE_API_URL=https://api.example.com \
+   -e VITE_API_URL=http://localhost:80/api \
    -v my-domains-data:/app \
    --name my-domains-info \
    yoorudziankou/my-domain-info:latest
@@ -46,7 +46,7 @@ docker run -d \
 - `-p 80:80` - Maps port 80 from container to host
 - `-e APP_HOST=0.0.0.0` - Sets the container's internal host for the application
 - `-e APP_PORT=80` - Sets the container's internal port for the application
-- `-e VITE_API_URL=https://api.example.com` - Passes the API URL to the frontend at runtime
+- `-e VITE_API_URL=http://localhost:80/api` - Passes the API URL to the frontend at runtime
 - `-v my-domains-data:/app` - Persists database to a Docker named volume (recommended)
 - `--name my-domains-info` - Names the container for easy management
 
