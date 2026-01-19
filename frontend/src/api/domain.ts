@@ -6,7 +6,8 @@ interface ErrorResponse {
 
 // Normalize API URL: ensure it ends with /api but no trailing slash
 function getApiUrl(): string {
-  const envUrl = import.meta.env.VITE_API_URL
+  const runtimeUrl = (window as any).APP_CONFIG?.API_URL
+  const envUrl = runtimeUrl || import.meta.env.VITE_API_URL
   if (envUrl && typeof envUrl === "string") {
     // Remove trailing slash if present, then ensure /api is at the end
     const clean = envUrl.replace(/\/+$/, "")
@@ -16,7 +17,6 @@ function getApiUrl(): string {
 }
 
 const API_URL = getApiUrl()
-
 export async function fetchDomains(page = 1, limit = 25): Promise<PaginatedDomainsResponse> {
   const offset = (page - 1) * limit
   const url = new URL(`${API_URL}/domain-info/`, location.origin)

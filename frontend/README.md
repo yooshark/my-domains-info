@@ -42,41 +42,6 @@ The frontend is a modern, single-page application built with Vue.js 3 that provi
 - **vue-tsc**: TypeScript type checking for Vue SFCs
 - **@vitejs/plugin-vue**: Vue SFC support for Vite
 
-## 📁 Project Structure
-
-```
-frontend/
-├── src/
-│   ├── api/                    # API client functions
-│   │   └── domain.ts          # Domain-related API calls
-│   ├── assets/                 # Static assets (images, fonts, etc.)
-│   ├── components/             # Reusable Vue components
-│   │   ├── AddDomainModal.vue # Modal for adding new domains
-│   │   ├── DomainTable.vue    # Table component for displaying domains
-│   │   └── ToastContainer.vue # Toast notification container
-│   ├── composables/            # Vue composition functions
-│   │   ├── useDomainInfo.ts   # Domain data fetching composables
-│   │   └── useToast.ts        # Toast notification composable
-│   ├── pages/                  # Page components
-│   │   └── DomainInfoPage.vue # Main domain information page
-│   ├── types/                  # TypeScript type definitions
-│   │   └── domain.ts          # Domain-related types
-│   ├── views/                  # View components
-│   │   └── HomeView.vue       # Home/landing view
-│   ├── App.vue                 # Root component
-│   ├── main.ts                 # Application entry point
-│   ├── style.css               # Global styles
-│   └── vite-env.d.ts           # Vite environment type definitions
-├── public/                     # Public static assets
-├── dist/                       # Production build output (generated)
-├── biome.json                  # Biome linter/formatter configuration
-├── package.json                # Dependencies and scripts
-├── tsconfig.json               # TypeScript configuration
-├── tsconfig.app.json           # TypeScript config for app code
-├── tsconfig.node.json          # TypeScript config for Node.js tooling
-└── vite.config.ts              # Vite build configuration
-```
-
 ## 🚀 Getting Started
 
 ### Prerequisites

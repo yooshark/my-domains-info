@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.core.settings import DatabaseSettings
+from app.core.uow import SaSessionUnitOfWork
 
 logger = logging.getLogger("app")
 
@@ -39,3 +40,17 @@ async def make_async_sessionmaker(
     )
     logger.debug("Async session maker initialized.")
     return async_session_factory
+
+
+@contextlib.asynccontextmanager
+async def create_session(
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> AsyncIterator[AsyncSession]:
+    async with sessionmaker() as session:
+        yield session
+
+
+async def sa_session_uow(
+    sessionmaker: async_sessionmaker[AsyncSession],
+) -> SaSessionUnitOfWork:
+    return SaSessionUnitOfWork(sessionmaker)
