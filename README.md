@@ -34,6 +34,8 @@ This service becomes your **domain control panel** that helps you:
 ```bash
 docker run -d \
    -p 80:80 \
+   -e APP_DEBUG=False \
+   -e APP_DEVELOP=False \
    -e APP_HOST=0.0.0.0 \
    -e APP_PORT=80 \
    -e VITE_API_URL=http://localhost:80/api \
@@ -44,6 +46,8 @@ docker run -d \
 
 **Command breakdown:**
 - `-p 80:80` - Maps port 80 from container to host
+- `-e APP_DEBUG=0.0.0.0` - Disables debug mode
+- `-e APP_DEVELOP=0.0.0.0` - Runs the application in production mode
 - `-e APP_HOST=0.0.0.0` - Sets the container's internal host for the application
 - `-e APP_PORT=80` - Sets the container's internal port for the application
 - `-e VITE_API_URL=http://localhost:80/api` - Passes the API URL to the frontend at runtime
