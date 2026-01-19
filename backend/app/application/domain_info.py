@@ -8,8 +8,8 @@ import tldextract
 from fastapi import HTTPException
 
 from app.core.enums import DomainTypes
+from app.core.uow import SaSessionUnitOfWork
 from app.db.models.domain_info import DomainInfo
-from app.db.repositories.domain_info import DomainInfoRepository
 from app.infrastructure.crt_sh_client import CrtShClient
 from app.infrastructure.ipinfo_client import IpInfoClient
 from app.infrastructure.ipwhois_client import IpWhoIsClient
@@ -22,12 +22,12 @@ class DomainInfoService:
 
     def __init__(
         self,
-        repo: DomainInfoRepository,
+        uow: SaSessionUnitOfWork,
         crt_sh_cl: CrtShClient,
         ip_who_is_cl: IpWhoIsClient,
         ip_info_cl: IpInfoClient,
     ):
-        self.repo = repo
+        self.uow = uow
         self.crt_sh_cl = crt_sh_cl
         self.ip_who_is_cl = ip_who_is_cl
         self.ip_info_cl = ip_info_cl
@@ -104,12 +104,16 @@ class DomainInfoService:
                     "Failed to collect",
                     extra={"domain": domain, "result": repr(result)},
                 )
-        return await self.repo.bulk_insert(valid_results)
+        async with self.uow:
+            return await self.uow.domain_info.bulk_insert(valid_results)
 
     async def add_domain(self, domain_name: str) -> list[DomainInfo]:
-        existing = await self.repo.get_by_domain_name(domain_name)
-        if existing is not None:
-            raise HTTPException(status_code=400, detail="Domain name already exists")
+        async with self.uow:
+            existing = await self.uow.domain_info.get_by_domain_name(domain_name)
+            if existing is not None:
+                raise HTTPException(
+                    status_code=400, detail="Domain name already exists"
+                )
         return await self.handle_domain_name(domain_name)
 
     async def get_domains_info(
@@ -117,16 +121,16 @@ class DomainInfoService:
         limit: int,
         offset: int,
     ) -> tuple[int | None, list[DomainInfo]]:
-        return await self.repo.get_domains_info(limit=limit, offset=offset)
+        async with self.uow:
+            return await self.uow.domain_info.get_domains_info(
+                limit=limit, offset=offset
+            )
 
     async def refresh_domains_info(self) -> dict[str, str]:
-        root_domains = await self.repo.get_root_domain_names()
-        if not root_domains:
-            return {"status": "ok"}
-
-        rows = await self.repo.get_domain_names()
-        domains: dict[str, int] = {domain: id_ for id_, domain in rows}
-
+        async with self.uow:
+            root_domains = await self.uow.domain_info.get_root_domain_names()
+            if not root_domains:
+                return {"status": "ok"}
         root_domains_results = await asyncio.gather(
             *(self.get_target_domains(d) for d in root_domains),
             return_exceptions=True,
@@ -141,6 +145,9 @@ class DomainInfoService:
         if not domains_to_update:
             return {"status": "ok"}
 
+        async with self.uow:
+            rows = await self.uow.domain_info.get_domain_names()
+        domains: dict[str, int] = {domain: id_ for id_, domain in rows}
         tasks = [
             self.collect_domain_info({"domain_name": d, "id": domains.get(d)})
             for d in domains_to_update
@@ -161,7 +168,7 @@ class DomainInfoService:
                     extra={"domain": domain, "result": repr(result)},
                 )
 
-        if not valid_results:
-            return {"status": "ok"}
-        await self.repo.update_domains_info(data=valid_results)
+        if valid_results:
+            async with self.uow:
+                await self.uow.domain_info.update_domains_info(data=valid_results)
         return {"status": "ok"}

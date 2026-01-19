@@ -10,9 +10,6 @@ RUN npm install
 
 COPY frontend/ .
 
-ARG VITE_API_URL=http://localhost:80/api
-ENV VITE_API_URL=${VITE_API_URL}
-
 RUN npm run build
 
 

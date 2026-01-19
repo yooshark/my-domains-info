@@ -129,7 +129,7 @@ def add_fixture_dynamically(
 async def test_app(
     aioinject_container: aioinject.Container, app_settings: AppSettings
 ) -> AsyncIterator[FastAPI]:
-    async with aioinject_container.context() as ctx:
+    async with aioinject_container.context():
         aioinject_container.register(
             aioinject.Object(app_settings, AppSettings),
         )

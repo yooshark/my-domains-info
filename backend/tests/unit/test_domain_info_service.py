@@ -14,6 +14,16 @@ def repo() -> AsyncMock:
 
 
 @pytest.fixture
+def uow():
+    uow = AsyncMock()
+    uow.__aenter__.return_value = uow
+    uow.__aexit__.return_value = None
+
+    uow.domain_info = AsyncMock()
+    return uow
+
+
+@pytest.fixture
 def crt_client() -> AsyncMock:
     return AsyncMock()
 
@@ -30,13 +40,13 @@ def ipinfo_client() -> AsyncMock:
 
 @pytest.fixture
 def service(
-    repo: AsyncMock,
+    uow: AsyncMock,
     crt_client: AsyncMock,
     ipwhois_client: AsyncMock,
     ipinfo_client: AsyncMock,
 ) -> DomainInfoService:
     return DomainInfoService(
-        repo=repo,
+        uow=uow,
         crt_sh_cl=crt_client,
         ip_who_is_cl=ipwhois_client,
         ip_info_cl=ipinfo_client,
@@ -205,7 +215,7 @@ class TestHandleDomainName:
         self,
         monkeypatch: pytest.MonkeyPatch,
         service: DomainInfoService,
-        repo: AsyncMock,
+        uow: AsyncMock,
     ) -> None:
         domains = ["a.example.com", "b.example.com"]
 
@@ -222,14 +232,12 @@ class TestHandleDomainName:
 
         fake_domain = DomainInfo(domain_name="a.example.com")
         fake_domain_2 = DomainInfo(domain_name="b.example.com")
-        repo.bulk_insert.return_value = [fake_domain, fake_domain_2]
-        service.repo = repo
+        uow.domain_info.bulk_insert.return_value = [fake_domain, fake_domain_2]
 
         result = await service.handle_domain_name("example.com")
         assert result == [fake_domain, fake_domain_2]
-        repo.bulk_insert.assert_awaited_once()
-        # only one valid result
-        args, _ = repo.bulk_insert.await_args
+        uow.domain_info.bulk_insert.assert_awaited_once()
+        args, _ = uow.domain_info.bulk_insert.await_args
         assert args[0] == [{"domain_name": "a.example.com"}]
 
 
@@ -238,10 +246,9 @@ class TestAddDomain:
         self,
         monkeypatch: pytest.MonkeyPatch,
         service: DomainInfoService,
-        repo: AsyncMock,
+        uow: AsyncMock,
     ) -> None:
-        repo.get_by_domain_name.return_value = None
-        service.repo = repo
+        uow.domain_info.get_by_domain_name.return_value = None
 
         async def fake_handle(domain_name: str) -> list[DomainInfo]:
             return [DomainInfo(domain_name=domain_name)]
@@ -252,19 +259,24 @@ class TestAddDomain:
 
         assert len(result) == 1
         assert result[0].domain_name == "example.com"
-        repo.get_by_domain_name.assert_awaited_once_with("example.com")
+
+        uow.domain_info.get_by_domain_name.assert_awaited_once_with("example.com")
 
 
 class TestGetDomainsInfo:
     async def test_get_domains_info_delegates_to_repo(
-        self, service: DomainInfoService, repo: AsyncMock
+        self,
+        service: DomainInfoService,
+        uow: AsyncMock,
     ) -> None:
         fake_domains = [DomainInfo(domain_name="a"), DomainInfo(domain_name="b")]
-        service.repo = repo
-        repo.get_domains_info.return_value = (10, fake_domains)
+
+        uow.domain_info.get_domains_info.return_value = (10, fake_domains)
+
         result = await service.get_domains_info(limit=25, offset=0)
+
         assert result == (10, fake_domains)
-        repo.get_domains_info.assert_awaited_once_with(limit=25, offset=0)
+        uow.domain_info.get_domains_info.assert_awaited_once_with(limit=25, offset=0)
 
 
 class TestRefreshDomainsInfo:
@@ -299,11 +311,10 @@ class TestRefreshDomainsInfo:
         self,
         monkeypatch: pytest.MonkeyPatch,
         service: DomainInfoService,
-        repo: AsyncMock,
+        uow: AsyncMock,
     ) -> None:
-        service.repo = repo
-        repo.get_root_domain_names.return_value = ["example.com"]
-        repo.get_domain_names.return_value = [(1, "example.com")]
+        uow.domain_info.get_root_domain_names.return_value = ["example.com"]
+        uow.domain_info.get_domain_names.return_value = [(1, "example.com")]
 
         async def fake_get_target(domain: str) -> list[str]:  # noqa: ARG001
             return ["example.com"]
@@ -315,5 +326,7 @@ class TestRefreshDomainsInfo:
         monkeypatch.setattr(service, "collect_domain_info", fake_collect)
 
         resp = await service.refresh_domains_info()
+
         assert resp == {"status": "ok"}
-        repo.update_domains_info.assert_awaited_once()
+
+        uow.domain_info.update_domains_info.assert_awaited_once()

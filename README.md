@@ -33,14 +33,24 @@ This service becomes your **domain control panel** that helps you:
 
 ```bash
 docker run -d \
-  -p 80:80 \
-  -v my-domains-data:/app \
-  --name my-domains-info \
-  yoorudziankou/my-domain-info:latest
+   -p 80:80 \
+   -e APP_DEBUG=False \
+   -e APP_DEVELOP=False \
+   -e APP_HOST=0.0.0.0 \
+   -e APP_PORT=80 \
+   -e VITE_API_URL=http://localhost:80/api \
+   -v my-domains-data:/app \
+   --name my-domains-info \
+   yoorudziankou/my-domain-info:latest
 ```
 
 **Command breakdown:**
 - `-p 80:80` - Maps port 80 from container to host
+- `-e APP_DEBUG=0.0.0.0` - Disables debug mode
+- `-e APP_DEVELOP=0.0.0.0` - Runs the application in production mode
+- `-e APP_HOST=0.0.0.0` - Sets the container's internal host for the application
+- `-e APP_PORT=80` - Sets the container's internal port for the application
+- `-e VITE_API_URL=http://localhost:80/api` - Passes the API URL to the frontend at runtime
 - `-v my-domains-data:/app` - Persists database to a Docker named volume (recommended)
 - `--name my-domains-info` - Names the container for easy management
 
@@ -60,7 +70,7 @@ That's it! The application will automatically run database migrations and start 
 
 **Access the application:**
 - Web UI: http://localhost
-- API Documentation: http://localhost/api/docs
+- API Documentation: http://localhost/api/docs (!DEBUG mode)
 
 ### Using the Web Interface
 
@@ -76,24 +86,6 @@ That's it! The application will automatically run database migrations and start 
 3. **Refresh Domains:**
    - Click the "Refresh" button to update all domain information
 
-### Using the API
-
-**Add a domain:**
-```bash
-curl -X POST "http://localhost/api/domain-info/" \
-  -H "Content-Type: application/json" \
-  -d '{"domain_name": "example.com"}'
-```
-
-**Get all domains:**
-```bash
-curl "http://localhost/api/domain-info/?limit=25&offset=0"
-```
-
-**Refresh all domains:**
-```bash
-curl -X POST "http://localhost/api/domain-info/refresh"
-```
 
 ## 📖 What Information is Collected?
 

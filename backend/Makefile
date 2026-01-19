@@ -4,7 +4,7 @@ lint:
 	uv run ruff check app
 
 format:
-	uv run ruff format .
+	uv run ruff format app
 
 typecheck:
 	uv run mypy app
