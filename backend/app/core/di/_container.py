@@ -4,7 +4,12 @@ from aioinject.ext.fastapi import FastAPIExtension
 from app.application.domain_info import DomainInfoService
 from app.core import settings
 from app.core.server import new_server
-from app.db.providers import create_engine, make_async_sessionmaker
+from app.db.providers import (
+    create_engine,
+    create_session,
+    make_async_sessionmaker,
+    sa_session_uow,
+)
 from app.db.repositories.domain_info import DomainInfoRepository
 from app.infrastructure.crt_sh_client import CrtShClient
 from app.infrastructure.ipinfo_client import IpInfoClient
@@ -27,6 +32,8 @@ def new_container() -> aioinject.Container:
         aioinject.Singleton(create_engine),
         aioinject.Singleton(make_async_sessionmaker),
         aioinject.Singleton(new_server),
+        aioinject.Scoped(create_session),
+        aioinject.Scoped(sa_session_uow),
     )
 
     return container

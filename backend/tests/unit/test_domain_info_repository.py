@@ -7,7 +7,7 @@ from app.db.repositories.domain_info import DomainInfoRepository
 
 @pytest.fixture
 def repo(db_session: AsyncSession) -> DomainInfoRepository:
-    return DomainInfoRepository(session_factory=lambda: db_session)
+    return DomainInfoRepository(session=db_session)
 
 
 async def test_add_domain_info(repo: DomainInfoRepository) -> None:

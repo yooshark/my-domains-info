@@ -31,43 +31,6 @@ Technical documentation for the My Domains Info backend service.
 - **Type Checking**: mypy (Python)
 - **Database Migrations**: Alembic
 
-### Project Structure
-
-```
-backend/
-├── app/
-│   ├── adapters/           # API adapters and routes
-│   │   └── api/
-│   │       ├── routes/     # API route handlers
-│   │       └── main.py     # API router configuration
-│   ├── application/        # Business logic services
-│   │   └── domain_info.py  # Domain info service
-│   ├── core/               # Core configuration and DI
-│   │   ├── di/             # Dependency injection setup
-│   │   ├── enums.py        # Domain enums
-│   │   ├── server.py       # FastAPI app factory
-│   │   ├── settings.py     # Configuration settings
-│   │   └── utils.py        # Utility functions
-│   ├── db/                 # Database layer
-│   │   ├── models/         # SQLAlchemy models
-│   │   ├── repositories/  # Data access layer
-│   │   └── providers.py    # Database session provider
-│   ├── infrastructure/     # External service clients
-│   │   ├── crt_sh_client.py
-│   │   ├── ipinfo_client.py
-│   │   └── ipwhois_client.py
-│   ├── migrations/         # Alembic database migrations
-│   ├── schemas/            # Pydantic models
-│   │   └── domain_info.py  # API request/response schemas
-│   └── run.py              # Application entry point
-├── tests/                  # Test suite
-├── bin/                    # Scripts
-│   └── entrypoint.sh      # Docker entrypoint (runs migrations automatically)
-├── pyproject.toml          # Python dependencies
-├── alembic.ini             # Migration configuration
-└── Makefile                # Development commands
-```
-
 ## 🚀 Local Development Setup
 
 ### Prerequisites
@@ -114,7 +77,7 @@ make check         # Run all checks (lint + typecheck + test)
 
 ### Environment Variables
 
-Create a `.env` file in the project root with the following variables:
+Create a `.env` file in the project root with the following variables (see `.env.example`, for examples):
 
 #### Application Settings (`APP_*`)
 

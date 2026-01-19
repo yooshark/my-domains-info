@@ -6,7 +6,8 @@ interface ErrorResponse {
 
 // Normalize API URL: ensure it ends with /api but no trailing slash
 function getApiUrl(): string {
-  const envUrl = import.meta.env.VITE_API_URL
+  const runtimeUrl = (window as any).__ENV__?.VITE_API_URL
+  const envUrl = runtimeUrl || import.meta.env.VITE_API_URL
   if (envUrl && typeof envUrl === "string") {
     // Remove trailing slash if present, then ensure /api is at the end
     const clean = envUrl.replace(/\/+$/, "")
